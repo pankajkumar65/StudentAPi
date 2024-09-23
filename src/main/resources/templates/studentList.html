@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student List</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            color: #333;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            font-size: 2rem;
+            margin: 20px 0;
+        }
+
+        #studentList {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        #studentList table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #studentList th, #studentList td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        #studentList th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+
+        #studentList td {
+            background-color: #f9f9f9;
+        }
+
+        /* Styles for Update and Delete Buttons */
+        .action-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button.update {
+            background-color: #007BFF; /* Blue color for Update */
+            color: white;
+        }
+
+        .action-button.update:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        .action-button.delete {
+            background-color: #DC3545; /* Red color for Delete */
+            color: white;
+        }
+
+        .action-button.delete:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        #backButton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            width: 50%;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #updateButton {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #updateButton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Toast styling */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 1000;
+            font-size: 1rem;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Media queries for responsive design */
+        @media (max-width: 768px) {
+            #studentList {
+                width: 95%;
+            }
+
+            .modal-content {
+                width: 90%;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+     #searchSection {
+    display: flex;               /* Use flexbox for layout */
+    align-items: center;        /* Center items vertically */
+    justify-content: space-between; /* Space between elements */
+    margin-bottom: 20px;        /* Space below the search section */
+}
+
+#searchSection form {
+    display: flex;              /* Use flexbox for the form */
+    align-items: center;        /* Center items vertically */
+    gap: 10px;                  /* Space between items */
+}
+
+#searchSection input,
+#searchSection select {
+    padding: 12px;              /* Increase padding for input fields */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 150px;               /* Fixed width for inputs */
+    max-width: 200px;          /* Max width for responsiveness */
+    font-size: 1rem;            /* Font size */
+}
+
+#searchSection button {
+    padding: 12px 20px;        /* Padding for the button */
+    background-color: #007BFF; /* Button background color */
+    color: white;              /* Button text color */
+    border: none;              /* Remove border */
+    border-radius: 4px;       /* Rounded corners */
+    cursor: pointer;           /* Pointer cursor on hover */
+    font-size: 1rem;           /* Font size */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+#searchSection button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+    </style>
+
+</head>
+<body>
+<a id="backButton" href="/">Back to Registration</a>
+<h2>Student List</h2>
+<div id="searchSection">
+    <h3>Search By: </h3>
+    <form id="searchForm">
+        <select id="searchField">
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+            <option value="gender">Gender</option>
+            <option value="age">Age</option>
+        </select>
+        <input type="text" id="searchValue" placeholder="Enter value">
+        <input type="number" id="minAge" placeholder="Min Age" style="display:none;">
+        <input type="number" id="maxAge" placeholder="Max Age" style="display:none;">
+        <button type="button" onclick="searchStudents()">Search</button>
+    </form>
+</div>
+<div id="studentList"></div>
+
+<!-- Update Student Modal -->
+<div id="updateModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Update Student</h2>
+        <form id="updateForm">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <input type="text" id="gender" name="gender" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="mobileNo">Mobile No:</label>
+                <input type="text" id="mobileNo" name="mobileNo" required>
+            </div>
+            <button type="button" id="updateButton">Update</button>
+        </form>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<script>
+    let currentStudentId = null;
+
+    function fetchStudents() {
+        fetch('/students')
+            .then(response => response.json())
+            .then(data => {
+                let tableHtml = '<table><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Age</th><th>Gender</th><th>Address</th><th>Mobile No</th><th>Actions</th></tr></thead><tbody>';
+                data.forEach(student => {
+                    tableHtml += `<tr>
+                        <td>${student.id}</td>
+                        <td>${student.first_Name}</td>
+                        <td>${student.last_Name}</td>
+                        <td>${student.age}</td>
+                        <td>${student.gender}</td>
+                        <td>${student.address}</td>
+                        <td>${student.mobile_no}</td>
+                        <td>
+                            <button class="action-button update" onclick="openUpdateModal(${student.id}, '${student.first_Name}', '${student.last_Name}', ${student.age}, '${student.gender}', '${student.address}', '${student.mobile_no}')">Update</button>
+                            <button class="action-button delete" onclick="deleteStudent(${student.id})">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+                tableHtml += '</tbody></table>';
+                document.getElementById('studentList').innerHTML = tableHtml;
+            });
+    }
+
+    function openUpdateModal(id, firstName, lastName, age, gender, address, mobileNo) {
+        currentStudentId = id;
+        document.getElementById('firstName').value = firstName;
+        document.getElementById('lastName').value = lastName;
+        document.getElementById('age').value = age;
+        document.getElementById('gender').value = gender;
+        document.getElementById('address').value = address;
+        document.getElementById('mobileNo').value = mobileNo;
+        document.getElementById('updateModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('updateModal').style.display = 'none';
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    function deleteStudent(id) {
+        fetch(`/student/delete/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                showToast("Student deleted successfully!");
+                fetchStudents();
+            } else {
+                showToast("Failed to delete student.");
+            }
+        });
+    }
+
+    document.getElementById('updateButton').addEventListener('click', function() {
+        const updatedStudent = {
+            first_Name: document.getElementById('firstName').value,
+            last_Name: document.getElementById('lastName').value,
+            age: document.getElementById('age').value,
+            gender: document.getElementById('gender').value,
+            address: document.getElementById('address').value,
+            mobile_no: document.getElementById('mobileNo').value
+        };
+
+        fetch(`/student/update/${currentStudentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedStudent),
+        })
+        .then(response => {
+            if (response.ok) {
+                showToast("Student updated successfully!");
+                setTimeout(() => location.reload(), 1500); // Reload after toast disappears
+            } else {
+                return response.json().then(err => showToast(`Validation error: ${err}`));
+            }
+        })
+        .catch(error => {
+            console.error('Error updating student:', error);
+            showToast("Failed to update student.");
+        });
+
+        closeModal(); // Close the modal
+    });
+
+    // Fetch students when the page loads
+    document.addEventListener('DOMContentLoaded', fetchStudents);
+
+    document.getElementById('searchField').addEventListener('change', function() {
+    const searchField = this.value;
+    document.getElementById('minAge').style.display = (searchField === 'age') ? 'inline' : 'none';
+    document.getElementById('maxAge').style.display = (searchField === 'age') ? 'inline' : 'none';
+    document.getElementById('searchValue').style.display = (searchField !== 'age') ? 'inline' : 'none';
+});
+
+function searchStudents() {
+    const searchField = document.getElementById('searchField').value;
+    const searchValue = document.getElementById('searchValue').value;
+    const minAge = document.getElementById('minAge').value;
+    const maxAge = document.getElementById('maxAge').value;
+
+    const query = new URLSearchParams();
+    if (searchField === 'age') {
+        query.append('minAge', minAge);
+        query.append('maxAge', maxAge);
+    } else {
+        query.append(searchField, searchValue);
+    }
+
+    fetch(`/students/search?${query.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update student list with the filtered data
+            let tableHtml = '<table><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Age</th><th>Gender</th><th>Address</th><th>Mobile No</th><th>Actions</th></tr></thead><tbody>';
+            data.forEach(student => {
+                tableHtml += `<tr>
+                    <td>${student.id}</td>
+                    <td>${student.first_Name}</td>
+                    <td>${student.last_Name}</td>
+                    <td>${student.age}</td>
+                    <td>${student.gender}</td>
+                    <td>${student.address}</td>
+                    <td>${student.mobile_no}</td>
+                    <td>
+                        <button class="action-button update" onclick="openUpdateModal(${student.id}, '${student.first_Name}', '${student.last_Name}', ${student.age}, '${student.gender}', '${student.address}', '${student.mobile_no}')">Update</button>
+                        <button class="action-button delete" onclick="deleteStudent(${student.id})">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            tableHtml += '</tbody></table>';
+            document.getElementById('studentList').innerHTML = tableHtml;
+        });
+}
+
+</script>
+</body>
+</html>

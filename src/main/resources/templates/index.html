@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Student Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            position: relative; /* Needed for positioning the button */
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            max-width: 100%;
+            margin-bottom: 20px; /* Added space below the form */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        form div {
+            margin-bottom: 15px;
+        }
+
+        #successMessage {
+            display: none;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 500px;
+            max-width: 100%;
+        }
+
+        /* Button style */
+        #studentListButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        #studentListButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<a id="studentListButton" href="/studentsList">Student List</a>
+
+<div>
+    <div id="successMessage">
+        <p>Registration Successful!</p>
+    </div> <!-- Hidden success message -->
+
+    <h2>Student Registration Form</h2>
+    <form id="registrationForm" th:action="@{/student/add}" method="post">
+        <div>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="first_Name" required/>
+        </div>
+
+        <div>
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="last_Name" required/>
+        </div>
+
+        <div>
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required/>
+        </div>
+
+        <div>
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required/>
+        </div>
+
+        <div>
+            <label for="mobileNo">Mobile No:</label>
+            <input type="text" id="mobileNo" name="mobile_no" required/>
+        </div>
+
+        <div>
+            <input type="submit" value="Register"/>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById("registrationForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        var formData = {
+            first_Name: document.getElementById("firstName").value,
+            last_Name: document.getElementById("lastName").value,
+            age: document.getElementById("age").value,
+            gender: document.getElementById("gender").value,
+            address: document.getElementById("address").value,
+            mobile_no: document.getElementById("mobileNo").value
+        };
+
+        fetch("/student/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (response.status === 201) {
+                // Show success message
+                var successMessage = document.getElementById("successMessage");
+                successMessage.style.display = "block";
+
+                // Hide the success message after 3 seconds
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 1500);
+
+                // Reset the form
+                document.getElementById("registrationForm").reset();
+            } else {
+                console.log("Failed to add student.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    });
+</script>
+
+</body>
+</html>
